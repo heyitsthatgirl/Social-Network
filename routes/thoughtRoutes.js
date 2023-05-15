@@ -12,6 +12,7 @@ const {
 
 //get all thoughts
 //post route creates new thought
+//http://localhost:3001/thoughts/
 router.route("/").get(getThoughts).post(createThought);
 
 //get single thought

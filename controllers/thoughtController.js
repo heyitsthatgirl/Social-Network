@@ -15,6 +15,7 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
+  // this is adding the thought to "thoughts" but not to the users thought count, not sure how to fix
   createThought(req, res) {
     Thought.create(req.body)
       .then(({ thought }) => {
@@ -24,21 +25,18 @@ module.exports = {
           { new: true }
         );
       })
-      .then(
-        (user) =>
-          !user
-            ? res.status(404).json({
-                message: "Thought created, but no user found with this ID",
-              })
-            : res.json({ message: "thought created" })
-        // {
-        //   res.json(user);
-        // }
-      )
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({
+            message: "Thought created, but no user found with this ID",
+          });
+        }
+        res.json({ message: "thought created" });
+      })
       .catch((err) => res.status(500).json(err));
   },
   updateThought(req, res) {
-    User.findOneAndUpdate(
+    Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
       // $set operator replaces the value of a field with the specified value
       { $set: req.body },
@@ -89,10 +87,11 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
+  // this won't delete and I don't understand why
   deleteReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reactions: { reaction: req.params.reactionId } } },
+      { $pull: { reactions: { reactionId: req.params.reactionId } } },
       { runValidators: true, new: true }
     )
       .then((thought) =>
