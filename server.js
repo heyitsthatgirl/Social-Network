@@ -10,10 +10,10 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
 //import routes
-const postsRoute = require("./routes/posts");
+const thoughtRoute = require("./routes/thought");
 const userRoute = require("./routes/user");
 //app.use runs middleware, it can be any function connected to a route
-app.use("/posts", postsRoute);
+app.use("/thought", thoughtRoute);
 app.use("/user", userRoute);
 
 //connection string to local instance of MondoDB
@@ -26,13 +26,13 @@ const client = new MongoClient(connectionStringURI);
 let db;
 
 //create new variable to hold database name
-const dbName = "testDB";
+const dbName = "social_network_db";
 
 //use connect method to connect to the mongo server
 client
   .connect()
   .then(() => {
-    console.log("Connected to MongoDB");
+    console.log(`Connected to ${dbName}`);
     //use client.db() constructor to add new db instance
     db = client.db(dbName);
 
