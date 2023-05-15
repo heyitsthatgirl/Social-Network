@@ -29,15 +29,26 @@ module.exports = {
       // new: true returns the document with the applied update
       //   { new: true }
       { runValidators: true, new: true }
-    );
+    )
+      .then((updatedUser) => {
+        if (!updatedUser) {
+          return res
+            .status(404)
+            .json({ message: "No user found with that ID" });
+        }
+        res.json(updatedUser);
+      })
+      .catch((err) => res.status(500).json(err));
   },
   deleteUser(req, res) {
     User.findOneAndDelete({ _id: req.params.userId })
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: "No user with that ID" })
-          : Thought.deleteMany({ _id: { $in: user.thoughts } })
-      )
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ message: "No user with that ID" });
+        }
+        //having trouble with deleting thoughts associated with user
+        // return Thought.deleteMany({ _id: { $in: user.thoughts } });
+      })
       .then(() => res.json({ message: "User deleted" }))
       .catch((err) => res.status(500).json(err));
   },
