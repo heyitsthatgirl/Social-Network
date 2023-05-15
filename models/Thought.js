@@ -1,26 +1,34 @@
 const { Schema, model } = require("mongoose");
 
-const reactionSchema = new Schema({
-  reactionId: {
-    type: Schema.Types.ObjectId,
-    default: () => new Types.ObjectId(),
+// create reaction schema/model
+const reactionSchema = new Schema(
+  {
+    reactionId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
+    },
+    reactionBody: {
+      type: String,
+      required: true,
+      maxLength: 280,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  reactionBody: {
-    type: String,
-    required: true,
-    maxLength: 280,
-  },
-  username: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    //   * Use a getter method to format the timestamp on query
-    // get:
-  },
-});
+  {
+    toJSON: {
+      virtuals: true,
+      // getters: true
+    },
+    id: false,
+  }
+);
 
 // create thought schema/model
 const thoughtSchema = new Schema(
@@ -34,8 +42,6 @@ const thoughtSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      //   * Use a getter method to format the timestamp on query
-      // get:
     },
     username: {
       type: String,
@@ -51,6 +57,16 @@ const thoughtSchema = new Schema(
     id: false,
   }
 );
+
+// getter to return date
+reactionSchema.virtual("formattedCreatedAt").get(function () {
+  return this.createdAt.toISOString();
+});
+
+// getter to return date
+thoughtSchema.virtual("formattedCreatedAt").get(function () {
+  return this.createdAt.toISOString();
+});
 
 // Create a virtual called `reactionCount` that retrieves the length of the thought's `reactions` array field on query.
 thoughtSchema.virtual("reactionCount").get(function () {

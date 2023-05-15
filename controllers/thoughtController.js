@@ -1,4 +1,4 @@
-const Thought = require("../models/Thought");
+const { Thought, User } = require("../models");
 
 module.exports = {
   getThoughts(req, res) {
@@ -17,16 +17,24 @@ module.exports = {
   },
   createThought(req, res) {
     Thought.create(req.body)
-      .then(({ _id }) => {
+      .then(({ thought }) => {
         return User.findOneAndUpdate(
-          { _id: params.userId },
-          { $push: { thoughts: _id } },
+          { _id: req.body.userId },
+          { $push: { thoughts: thought._id } },
           { new: true }
         );
       })
-      .then((thoughtData) => {
-        res.json(thoughtData);
-      })
+      .then(
+        (user) =>
+          !user
+            ? res
+                .status(404)
+                .json({ message: "thought created, but no user with this ID" })
+            : res.json({ message: "thought created" })
+        // {
+        //   res.json(user);
+        // }
+      )
       .catch((err) => res.status(500).json(err));
   },
   //update thought
